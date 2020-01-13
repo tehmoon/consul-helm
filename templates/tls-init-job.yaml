@@ -45,6 +45,7 @@ spec:
             - "/bin/sh"
             - "-ec"
             - |
+              set -x
               consul tls ca create \
                 -domain={{ .Values.global.domain }}
               consul tls cert create -server \
@@ -66,18 +67,18 @@ spec:
                 -H "Authorization: Bearer $( cat /var/run/secrets/kubernetes.io/serviceaccount/token )" \
                 -H "Content-Type: application/json" \
                 -H "Accept: application/json" \
-                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-ca-cert\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"Opaque\", \"data\": { \"tls.crt\": \"$( cat {{ .Values.global.domain }}-agent-ca.pem | base64 | tr -d '\n' )\" }}" > /dev/null
+                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-ca-cert\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"Opaque\", \"data\": { \"tls.crt\": \"$( cat {{ .Values.global.domain }}-agent-ca.pem | base64 | tr -d '\n' )\" }}"
               curl -s -X POST --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
                 https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}/api/v1/namespaces/${NAMESPACE}/secrets \
                 -H "Authorization: Bearer $( cat /var/run/secrets/kubernetes.io/serviceaccount/token )" \
                 -H "Content-Type: application/json" \
                 -H "Accept: application/json" \
-                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-ca-key\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"Opaque\", \"data\": { \"tls.key\": \"$( cat {{ .Values.global.domain }}-agent-ca-key.pem | base64 | tr -d '\n' )\" }}" > /dev/null
+                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-ca-key\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"Opaque\", \"data\": { \"tls.key\": \"$( cat {{ .Values.global.domain }}-agent-ca-key.pem | base64 | tr -d '\n' )\" }}"
               curl -s -X POST --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
                 https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}/api/v1/namespaces/${NAMESPACE}/secrets \
                 -H "Authorization: Bearer $( cat /var/run/secrets/kubernetes.io/serviceaccount/token )" \
                 -H "Content-Type: application/json" \
                 -H "Accept: application/json" \
-                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-server-cert\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"kubernetes.io/tls\", \"data\": { \"tls.crt\": \"$( cat {{ .Values.global.datacenter }}-server-{{ .Values.global.domain }}-0.pem | base64 | tr -d '\n' )\", \"tls.key\": \"$( cat {{ .Values.global.datacenter }}-server-{{ .Values.global.domain }}-0-key.pem | base64 | tr -d '\n' )\" } }" > /dev/null
+                -d "{ \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"{{ template "consul.fullname" . }}-server-cert\", \"namespace\": \"${NAMESPACE}\" }, \"type\": \"kubernetes.io/tls\", \"data\": { \"tls.crt\": \"$( cat {{ .Values.global.datacenter }}-server-{{ .Values.global.domain }}-0.pem | base64 | tr -d '\n' )\", \"tls.key\": \"$( cat {{ .Values.global.datacenter }}-server-{{ .Values.global.domain }}-0-key.pem | base64 | tr -d '\n' )\" } }"
 {{- end }}
 {{- end }}
